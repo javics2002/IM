@@ -18,6 +18,16 @@ def osc(frec, dur, vol = 1, phs = 0):
 def fadeOut(sample, t):
     return np.array([sample if i < t  else (sample * (sample.size - i)) / (sample.size - t) for i in sample])
 
-onda = osc(1, 1, 1)
+#Crece la intensidad desde el inicio hasta el instante t
+def fadeIn(sample, t):
+    return np.array([sample if i > t  else (sample * i) / t for i in sample])
+
+onda = osc(2, 1, 1)
 plt.plot(fadeOut(onda, .2))
+onda2 = osc(3, 1, 1, 10000)
+plt.plot(fadeOut(onda, .8))
+
+
+# %%
+print("hola")
 # %%
