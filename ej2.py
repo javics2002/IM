@@ -32,6 +32,7 @@ s = np.arange(int(SRATE * DURATION), dtype=float)
 sin = VOL * np.sin(HZ * 2 * np.pi * s / SRATE)
 
 plt.plot(sin)
+
 # %% 2s a 3Hz
 DURATION = 2
 HZ = 3
@@ -40,4 +41,5 @@ s = np.arange(int(SRATE * DURATION), dtype=float)
 sin = VOL * np.sin(HZ * 2 * np.pi * s / SRATE)
 
 plt.plot(sin)
+
 # %%

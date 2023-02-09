@@ -14,34 +14,40 @@ import matplotlib.pyplot as plt
 SRATE = 44100
 
 #Devuelve una señal sinusoidal de frecuencia frec, duracion dur y volumen vol
-def osc(frec, dur, vol, phs):
+def osc(frec, dur, vol = 1, phs = 0):
     s = np.arange(int(SRATE * dur))
-    return vol * np.sin(frec * 2 * np.pi * s / SRATE)
+    return vol * np.sin((frec * 2 * np.pi * s - phs) / SRATE)
 
 plt.plot(osc(1, 1, 1))
 plt.plot(osc(4, 1, .4))
-plt.plot(osc(3, .5, .8))
+plt.plot(osc(3, .5, .8, 20000))
+
 #%% Saw
-def saw(frec, dur, vol):
+import math
+def saw(frec, dur, vol = 1, phs = 0):
     s = np.arange(int(SRATE * dur))
-    return 2 * vol / np.pi * np.arctan(np.tan(frec * np.pi * s / SRATE))
+    return 2 * vol / np.pi * np.arctan(np.tan((2 * frec * np.pi * s - phs) / (2 * SRATE)))
 
 plt.plot(saw(1, 1, 1))
 plt.plot(saw(4, 1, .4))
 plt.plot(saw(3, .5, .8))
+
 #%% Square
-def sqr(frec, dur, vol):
+def sqr(frec, dur, vol = 1, phs = 0, duty = .5):
     s = np.arange(int(SRATE * dur))
-    return 2 * vol / np.pi * np.arctan(np.tan(frec * np.pi * s / SRATE))
+    return np.array([vol if ((frec * t - phs) % SRATE) / SRATE < duty  else -vol for t in s])
 
 plt.plot(sqr(1, 1, 1))
 plt.plot(sqr(4, 1, .4))
 plt.plot(sqr(3, .5, .8))
+
 #%% Triangle
 def tri(frec, dur, vol):
     s = np.arange(int(SRATE * dur))
-    return 2 * vol / np.pi * np.arctan(np.tan(frec * np.pi * s / SRATE))
+    return 2 * vol / np.pi * np.arcsin(np.sin(2 * frec * np.pi * s / SRATE))
 
 plt.plot(tri(1, 1, 1))
 plt.plot(tri(4, 1, .4))
 plt.plot(tri(3, .5, .8))
+
+# %%

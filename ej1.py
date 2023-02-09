@@ -17,4 +17,5 @@ DURATION = .1
 noise = np.random.random(int(SRATE * DURATION)) * 2 - 1
 
 plt.plot(noise)
+
 # %%
