@@ -1,24 +1,38 @@
-'''Modificar el oscilador sinusoidal visto en clase (con chunks) para poder 
-variar su frecuencia en tiempo de ejecución con las teclas 'F' (subir) y 
-'f' (bajar), así como el volumen con 'V y 'v'.'''
+'''Implementar osciladores similares al anterior, pero de onda cuadrada, 
+diente de sierra y triangular.
+Estas formas pueden generarse de manera manual o utilizar predefinidas de SciPy'''
 
 import numpy as np         # arrays    
 import sounddevice as sd   # modulo de conexión con portAudio
 import kbhit               # para lectura de teclas no bloqueante
+from scipy import signal
+from enum import Enum
 
 SRATE = 44100
 CHUNK = 1024
+
+class Waveform(Enum):
+    SINE = 1
+    SQUARE = 2
+    SAWTOOTH = 3
 
 class Osc:
     def __init__(self, frec):
         self.frec = frec
         self.phs = 0
+        self.type = Waveform.SINE
 
     def next(self):
         s = np.arange(CHUNK, dtype=np.float32)
-        chunk = np.sin(2 * np.pi * self.frec * (s + self.phs) / SRATE, dtype=np.float32)
+        chunk = np.zeros(CHUNK)
+        if(self.type == Waveform.SINE):
+            chunk = np.sin(2 * np.pi * self.frec * (s + self.phs) / SRATE)
+        elif(self.type == Waveform.SQUARE):
+            chunk = signal.square(2 * np.pi * self.frec * (s + self.phs) / SRATE)
+        elif(self.type == Waveform.SAWTOOTH):
+            chunk = signal.sawtooth(2 * np.pi * self.frec * (s + self.phs) / SRATE)
         self.phs += CHUNK
-        return chunk
+        return chunk.astype(np.float32)
 
 # abrimos stream de salida
 stream = sd.OutputStream(
@@ -54,6 +68,9 @@ while c != 'q':
         # Hay pops fuertes al cambiar la frecuencia
         elif (c =='f'): osc.frec -= 5 
         elif (c =='F'): osc.frec += 5
+        elif (c == '1'): osc.type = Waveform.SINE
+        elif (c == '2'): osc.type = Waveform.SQUARE
+        elif (c == '3'): osc.type = Waveform.SAWTOOTH
         print("Vol: ",vol, " Frec: ", osc.frec)
 
     numBloque += 1

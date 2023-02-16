@@ -12,22 +12,26 @@ SRATE = 44100
 #Devuelve una señal sinusoidal de frecuencia frec, duracion dur y volumen vol
 def osc(frec, dur, vol = 1, phs = 0):
     s = np.arange(int(SRATE * dur))
-    return vol * np.sin((frec * 2 * np.pi * s - phs) / SRATE)
+    return vol * np.sin(frec * (2 * np.pi * s - phs) / SRATE)
 
-#Decrece la intensidad desde el instante t hasta el final
+# Decrece la intensidad desde el instante t hasta el final
 def fadeOut(sample, t):
-    return np.array([sample if i < t  else (sample * (sample.size - i)) / (sample.size - t) for i in sample])
+    fade_samples = int(len(sample) - t * SRATE)
+    fade = np.linspace(1, 0, fade_samples)
+    sample[int(t*SRATE):] = sample[int(t*SRATE):] * fade
+    return sample
 
-#Crece la intensidad desde el inicio hasta el instante t
+# Incrementa la intensidad desde el inicio hasta el instante t
 def fadeIn(sample, t):
-    return np.array([sample if i > t  else (sample * i) / t for i in sample])
+    fade_samples = int(t * SRATE)
+    fade = np.linspace(0, 1, fade_samples)
+    sample[:int(t*SRATE)] = sample[:int(t*SRATE)] * fade
+    return sample
 
 onda = osc(2, 1, 1)
 plt.plot(fadeOut(onda, .2))
 onda2 = osc(3, 1, 1, 10000)
-plt.plot(fadeOut(onda, .8))
+plt.plot(fadeIn(onda2, .8))
 
 
-# %%
-print("hola")
 # %%
