@@ -35,15 +35,17 @@ CHUNK = 64
 
 class WaveTable:
     def __init__(self):
-        self.data = np.sin(2*np.pi*np.arange(SRATE)/SRATE)
-        self.n = len(self.data)
-        self.i = int(0)
+        self.data = np.sin(2*np.pi*np.arange(SRATE)/SRATE)      #frecuencia base: una oscilacion de 1Hz
+        self.n = len(self.data)                                 #tamaño de la tabla
+        self.i = int(0)                                         #iterador
+        self.vol = 0                                            #volumen
 
-    def nextChunk(self, chunk, frec):
-        samples = np.zeros(chunk)
+    def nextChunk(self, chunk, frec, targetVol):
+        samples = np.linspace(self.vol, targetVol, chunk)       #suavizado de volumen
         for k in range(chunk):
-            samples[k] = self.data[int(self.i)]
+            samples[k] = samples[k] * self.data[int(self.i)]
             self.i = int(self.i + frec) % self.n
+        self.vol = targetVol
         return samples
 
 stream = sd.OutputStream(samplerate=SRATE,blocksize=CHUNK,channels=1)  
@@ -75,12 +77,10 @@ while not quit:
             quit = True
 
     frec = 100 + (2000 - 100) * mouseX / WIDTH
-    amp = .1 * mouseY / HEIGHT + amp * .9           #suavizado de volumen
+    amp = mouseY / HEIGHT
     
-    samples = amp * waveTable.nextChunk(CHUNK, frec)   
+    samples = amp * waveTable.nextChunk(CHUNK, frec, amp)   
     stream.write(np.float32(0.9*samples)) 
 
-
 stream.stop()
-
 pygame.quit()
